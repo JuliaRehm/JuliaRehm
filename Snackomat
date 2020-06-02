@@ -1,0 +1,149 @@
+#include <Servo.h>
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(12,11,5,4,3,2);
+
+int taster1=31;
+int taster2=26;
+int taster3=30;
+int taster4=24;
+
+Servo servo1,servo2,servo3,servo4;
+
+int sensor=9;
+int buttonPressed;
+int coinDetected = 0;
+int coinCounter = 0;
+int coinLoop = 0;
+
+
+void setup()
+{
+  
+  servo1.attach(6);
+  servo2.attach(8);
+  servo3.attach(13);
+  servo4.attach(7);
+  
+  pinMode(taster1, INPUT_PULLUP);
+  pinMode(taster2, INPUT_PULLUP);
+  pinMode(taster3, INPUT_PULLUP);
+  pinMode(taster4, INPUT_PULLUP);
+  
+  lcd.begin(16, 2);
+  pinMode(sensor, INPUT);
+
+}
+void loop ()
+{
+  lcd.clear();
+  lcd.setCursor(3, 0);
+  lcd.print("Bitte Geld");
+  lcd.setCursor(3, 2);
+  lcd.print("einwerfen!");
+
+ // Wait until a coin is detected
+  while (!coinDetected || coinLoop <6) {
+    
+    if (digitalRead(sensor) == LOW ) { // If a coin is detected, exit the from the while loop
+      coinDetected = 1;
+      coinCounter = coinCounter + 1;
+      coinLoop = 0;
+      
+      
+   lcd.clear();
+   lcd.setCursor(1,0);
+   lcd.print(coinCounter);
+ 
+  
+   }
+    if (coinDetected){        // wenn die Münze eingeworfen wurde, wird im coinLoop die Zeit gezählt 
+    coinLoop = coinLoop + 1;
+    delay(1000);
+   lcd.setCursor(1,1);
+   lcd.print(coinLoop); 
+    }
+    
+   }
+
+  
+  delay(10);
+  lcd.clear();
+  lcd.setCursor(1, 0);
+  lcd.print("Produktauswahl");
+  lcd.setCursor(0, 1);
+  lcd.print(" 1, 2, 3 oder 4");
+  
+  // Wait until a button is pressed
+  while (true) {
+    if (digitalRead(taster1) == LOW && coinCounter==1) {
+      buttonPressed = 1;
+      break;
+    }
+      if (digitalRead(taster2) == LOW && coinCounter==2) {
+      buttonPressed = 2;
+      break;
+  }
+      if (digitalRead(taster3) == LOW && coinCounter==2) {
+      buttonPressed = 3;
+      break;
+  }
+      if (digitalRead(taster4) == LOW && coinCounter==1) {
+      buttonPressed = 4;
+      break;
+  }
+  }
+  // Print "Delivering..." 
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Bitte warten...");
+  
+  // Depending on the pressed button, move the carrier to that position and discharge the selected item 
+  switch (buttonPressed) {
+    case 1:
+ 
+      servo1.writeMicroseconds(-2000); // rotate
+      delay(950);
+      servo1.writeMicroseconds(1500);  // stop
+      delay(500);
+      break;
+
+    case 2:
+     
+      // Rotate the helix, push the selected item
+      servo2.writeMicroseconds(-2000); // rotate
+      delay(950);
+      servo2.writeMicroseconds(1500);  // stop
+      delay(500);
+      break;
+
+    case 3:
+     
+      // Rotate the helix, push the selected item
+      servo3.writeMicroseconds(-2000); // rotate
+      delay(950);
+      servo3.writeMicroseconds(1500);  // stop
+      delay(500);
+      break;
+
+     case 4:
+     
+      // Rotate the helix, push the selected item
+      servo4.writeMicroseconds(-2000); // rotate
+      delay(950);
+      servo4.writeMicroseconds(1500);  // stop
+      delay(500);
+      break;
+  }
+  
+  lcd.clear(); // Clears the display
+  lcd.setCursor(0, 0);
+  lcd.print("Snack entnehmen!"); // Prints on the LCD
+  lcd.setCursor(1, 1);
+  lcd.print("Guten Appetit!");
+  delay(3000);
+  
+coinCounter=0;
+coinDetected=0;
+coinLoop=0;
+}
